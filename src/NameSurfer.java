@@ -56,12 +56,15 @@ public class NameSurfer extends Program implements NameSurferConstants {
 	}
 
 	private void graphName(String name) {
+
         System.out.println(data.findEntry(name));
+        if(data.findEntry(name) == null) return;
         graph.addEntry(data.findEntry(name));
     }
 
     private void clearGraph() {
         System.out.println("Clear");
+        graph.clear();
     }
 	private void initInteractors() {
         add(new Label("Name"), SOUTH);

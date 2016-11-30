@@ -10,6 +10,7 @@ import acm.graphics.GCanvas;
 import acm.graphics.GLabel;
 import acm.graphics.GLine;
 
+import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import java.util.List;
 public class NameSurferGraph extends GCanvas
 	implements NameSurferConstants, ComponentListener {
 
+    private static final double NAMEOFFSET = 2.0;
     private List<NameSurferEntry> entries;
 
 	/**
@@ -70,26 +72,50 @@ public class NameSurferGraph extends GCanvas
         double top = GRAPH_MARGIN_SIZE;
         double bottom = height - GRAPH_MARGIN_SIZE;
         double rankPos = (bottom - top) / 1000;
+        currentColor = 0;
         for(NameSurferEntry entry : entries) {
+            Color color = getNextColor();
             double lastX = 0;
             int rank = entry.getRank(0);
             if(rank == 0) rank = 1000;
             double lastY = (rank * rankPos) + GRAPH_MARGIN_SIZE;
             double newX;
             double newY;
-            for (int i = 1; i < NDECADES; i++) {
+            for (int i = 0; i < NDECADES; i++) {
                 newX = vertOffset * i;
                 rank = entry.getRank(i);
                 if(rank == 0) rank = 1000;
                 newY = (rank * rankPos) + GRAPH_MARGIN_SIZE;
-                add(new GLine(lastX, lastY, newX, newY));
+                GLine line = new GLine(lastX, lastY, newX, newY);
+                line.setColor(color);
+                add(line);
+                int labelRank = entry.getRank(i);
+                String rankString = labelRank != 0 ? Integer.toString(labelRank) : "*";
+                GLabel label = new GLabel(entry.getName() + " " + rankString, newX+NAMEOFFSET, newY-NAMEOFFSET);
+				label.setColor(color);
+                add(label);
                 lastX = newX;
                 lastY = newY;
             }
         }
     }
 
+    private int currentColor;
 
+    private Color getNextColor() {
+        currentColor = ++currentColor % 4;
+        switch (currentColor) {
+            case 0:
+                return Color.red;
+            case 1:
+                return Color.blue;
+            case 2:
+                return Color.green;
+            case 3:
+                return Color.magenta;
+        }
+        return Color.black;
+    }
     private double width;
     private double height;
     private double vertOffset;
